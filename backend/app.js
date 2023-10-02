@@ -5,17 +5,16 @@ const rateLimit = require("express-rate-limit");
 const bodyParser = require("body-parser");
 const { errors } = require('celebrate');
 const morgan = require('morgan');
+const cors = require('cors');
 const handleError = require('./middlewares/handleError');
 require('dotenv').config();
-const cors = require('cors');
 
-
-const { PORT = 4000, DB_URL = "mongodb://localhost:27017/mestodb" } = process.env;
+const { PORT = 3001, DB_URL = "mongodb://localhost:27017/mestodb" } =
+  process.env;
 
 const app = express();
 
-app.use(cors({ origin: "http://localhost:3000",
-credentials: true }));
+app.use(cors());
 
 app.use(morgan('dev'));
 

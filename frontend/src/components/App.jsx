@@ -88,7 +88,7 @@ function App() {
 
   useEffect(() => {
     if(loggedIn) {
-    Promise.all([api.getInfo(), api.getCards()])
+    Promise.all([api.getInfo(localStorage.jwt), api.getCards(localStorage.jwt)])
       .then(([dataUser, dataCards]) => {
         setСurrentUser(dataUser);
         setCards(dataCards);
@@ -102,7 +102,7 @@ function App() {
   const handleUpdateUser = (userData) => {
     setIsLoading(true);
     api
-      .sentUsersData(userData)
+      .sentUsersData(userData, localStorage.jwt)
       .then((data) => {
         setСurrentUser(data);
         closeAllPopups();
@@ -116,7 +116,7 @@ function App() {
   const handleUpdateAvatar = (data) => {
     setIsLoading(true);
     api
-      .addAvatar(data)
+      .addAvatar(data, localStorage.jwt)
       .then((res) => {
         setСurrentUser(res);
         closeAllPopups();
@@ -130,7 +130,7 @@ function App() {
   const handleAddPlaceSubmit = (cardData) => {
     setIsLoading(true);
     api
-      .createCard(cardData)
+      .createCard(cardData, localStorage.jwt)
       .then((newCards) => {
         setCards([newCards, ...cards]);
         closeAllPopups();
@@ -142,7 +142,7 @@ function App() {
   const handleCardDelete = (card) => {
     setIsLoading(true);
     api
-      .deleteCard(card._id)
+      .deleteCard(card._id, localStorage.jwt)
       .then(() => {
         //исключаем из массива state те карточки, у которых _id совпадает с _id переданной карточки card
         //Удаляем карточку из состояния cards после успешного удаления
@@ -157,11 +157,11 @@ function App() {
 
   const handleCardLike = (card) => {
     // есть ли уже лайк на этой карточке
-    const isLiked = card.likes.some((item) => item._id === currentUser._id);
+    const isLiked = card.likes.some((item) => item === currentUser._id);
     // Отправляем запрос в API и получаем обновлённые данные карточки
     if (!isLiked) {
       api
-        .addLike(card._id)
+        .addLike(card._id, localStorage.jwt)
         .then((newCard) => {
           setCards((state) =>
             state.map((c) => (c._id === card._id ? newCard : c))
@@ -172,7 +172,7 @@ function App() {
         });
     } else {
       api
-        .deleteLike(card._id)
+        .deleteLike(card._id, localStorage.jwt)
         .then((newCard) => {
           setCards((state) =>
             state.map((c) => (c._id === card._id ? newCard : c))
@@ -194,10 +194,12 @@ function App() {
   };
 
   useEffect(() => {
+    const jwt = localStorage.getItem("jwt");
+    if (jwt) {
       auth
-        .checkToken()
+        .checkToken(jwt)
         .then((res) => {
-          setEmail(res.data.email);
+          setEmail(res.email);
           setLoggedIn(true);
           navigate("/", { replace: true });
         })
@@ -209,6 +211,7 @@ function App() {
           }
           console.log(err);
         });
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -233,6 +236,7 @@ function App() {
     auth
       .authorize(email, password)
       .then((data) => {
+        localStorage.setItem('jwt', data.token);
         setLoggedIn(true);
         setEmail(email);
         navigate("/", { replace: true });
@@ -247,7 +251,10 @@ function App() {
       });
   };
 
+
+
   const handleSignOut = () => {
+    localStorage.removeItem("jwt");
     setLoggedIn(false);
     navigate("/sign-in", { replace: true });
   };
