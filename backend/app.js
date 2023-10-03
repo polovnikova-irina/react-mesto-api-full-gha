@@ -1,17 +1,16 @@
+require('dotenv').config(); //для загрузки переменных окружения из файла .env
 const express = require("express");
 const mongoose = require("mongoose");
-const helmet = require("helmet");
-const rateLimit = require("express-rate-limit");
+const helmet = require("helmet"); //для обеспечения безопасности
+const rateLimit = require("express-rate-limit"); //ограничивает количество запросов, поступающих на  сервер
 const bodyParser = require("body-parser");
 const { errors } = require('celebrate');
-const morgan = require('morgan');
+const morgan = require('morgan'); //логирования HTTP-запросов и ответов, детализированный журнал всех запросов
 const cors = require('cors');
 const handleError = require('./middlewares/handleError');
-require('dotenv').config();
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
-const { PORT = 3001, DB_URL = "mongodb://localhost:27017/mestodb" } =
-  process.env;
-
+const { PORT = 3000, DB_URL } = process.env;
 const app = express();
 
 app.use(cors());
@@ -22,7 +21,6 @@ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
 });
-app.use(limiter);
 
 app.use(helmet());
 
@@ -35,7 +33,13 @@ mongoose.connect(DB_URL, {
   useUnifiedTopology: true,
 });
 
+app.use(requestLogger);
+
+app.use(limiter);
+
 app.use("/", require("./routes/index"));
+
+app.use(errorLogger);
 
 // обработчик ошибок celebrate
 app.use(errors());

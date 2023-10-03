@@ -7,7 +7,7 @@
 ## Стек технологий
 * Node.js
 * Express.js
-*  MongoDB
+* MongoDB
 * Mongoose
 
 ### [Ссылка на репозиторий](https://github.com/polovnikova-irina/express-mesto-gha)
