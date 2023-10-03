@@ -131,8 +131,8 @@ function App() {
     setIsLoading(true);
     api
       .createCard(cardData, localStorage.jwt)
-      .then((newCards) => {
-        setCards([newCards, ...cards]);
+      .then((newCard) => {
+        setCards([newCard, ...cards]);
         closeAllPopups();
       })
       .catch((err) => console.log("Ошибка при добавлении карточки:", err))
