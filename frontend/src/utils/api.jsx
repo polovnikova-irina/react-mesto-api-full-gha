@@ -92,7 +92,7 @@ class Api {
 }
 
 export const api = new Api({
-  baseUrl: 'api.project.nomoredomains.nomoredomainsrocks.ru',
+  baseUrl: 'https://api.project.nomoredomains.nomoredomainsrocks.ru',
 });
 
 
