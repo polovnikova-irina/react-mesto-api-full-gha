@@ -7,4 +7,4 @@ class UnauthorizedError extends Error {
   }
 }
 
-module.exports = UnauthorizedError; //401
+module.exports = UnauthorizedError; // 401

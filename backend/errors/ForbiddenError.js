@@ -7,4 +7,4 @@ class ForbiddenError extends Error {
   }
 }
 
-module.exports = ForbiddenError; //403
+module.exports = ForbiddenError; // 403

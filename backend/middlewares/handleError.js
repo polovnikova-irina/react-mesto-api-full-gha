@@ -7,9 +7,9 @@ const handleError = ((err, req, res, next) => {
     .send({
       message: statusCode === HTTP_STATUS_INTERNAL_SERVER_ERROR
         ? 'На сервере произошла ошибка'
-        : message
+        : message,
     });
-    next();
+  next();
 });
 
-module.exports = handleError; //500
+module.exports = handleError; // 500

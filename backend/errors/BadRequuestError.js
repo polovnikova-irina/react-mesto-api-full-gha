@@ -7,4 +7,4 @@ class BadRequestError extends Error {
   }
 }
 
-module.exports = BadRequestError; //400
+module.exports = BadRequestError; // 400

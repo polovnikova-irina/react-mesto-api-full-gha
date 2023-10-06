@@ -1,12 +1,12 @@
-const Card = require("../models/card");
-const BadRequestError = require("../errors/BadRequuestError");
-const NotFoundError = require("../errors/NotFoundError");
-const ForbiddenError = require("../errors/ForbiddenError");
+const Card = require('../models/card');
+const BadRequestError = require('../errors/BadRequuestError');
+const NotFoundError = require('../errors/NotFoundError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.status(200).send(cards.reverse()))
-    .catch(next)
+    .catch(next);
 };
 
 module.exports.addCard = (req, res, next) => {
@@ -15,15 +15,15 @@ module.exports.addCard = (req, res, next) => {
   Card.create({ name, link, owner })
     .then((card) => {
       if (!card) {
-        throw new NotFoundError("Некорректный _id карточки");
+        throw new NotFoundError('Некорректный _id карточки');
       }
       res.status(201).send(card);
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
+      if (err.name === 'ValidationError') {
         next(new BadRequestError(err.message));
-      } else if (err.name === "DocumentNotFoundError") {
-        next(new NotFoundError("Некорректный _id карточик"));
+      } else if (err.name === 'DocumentNotFoundError') {
+        next(new NotFoundError('Некорректный _id карточик'));
       } else {
         next(err);
       }
@@ -31,73 +31,73 @@ module.exports.addCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  const cardId = req.params.cardId;
+  const { cardId } = req.params;
   Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        throw new NotFoundError("Карточка по указанному _id не найдена");
+        throw new NotFoundError('Карточка по указанному _id не найдена');
       }
       if (card.owner.toString() !== req.user._id) {
-        throw new ForbiddenError("Карточка другого пользователя")
+        throw new ForbiddenError('Карточка другого пользователя');
       }
       return Card.findByIdAndRemove(cardId);
     })
     .then(() => {
-      res.status(200).send({ message: "Карточка удалена" });
+      res.status(200).send({ message: 'Карточка удалена' });
     })
     .catch((err) => {
-      if (err.name === "CastError") {
-        next(new BadRequestError("Указан некорректный _id карточки"))
-      } else if (err.name === "DocumentNotFoundError") {
-      next(new NotFoundError("Катрточка по указанному _id не найден"))
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Указан некорректный _id карточки'));
+      } else if (err.name === 'DocumentNotFoundError') {
+        next(new NotFoundError('Катрточка по указанному _id не найден'));
       } else {
         next(err);
       }
-})
+    });
 };
 
 module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true }
+    { new: true },
   )
     .then((card) => {
       if (!card) {
-        throw new NotFoundError("Карточка по указанному _id не найдена");
+        throw new NotFoundError('Карточка по указанному _id не найдена');
       }
       res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === "CastError") {
-        next(new BadRequestError("Указан некорректный _id карточки"))
-      } else if (err.name === "DocumentNotFoundError") {
-      next(new NotFoundError("Пользователь по указанному _id не найден"))
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Указан некорректный _id карточки'));
+      } else if (err.name === 'DocumentNotFoundError') {
+        next(new NotFoundError('Пользователь по указанному _id не найден'));
       } else {
         next(err);
       }
-})
+    });
 };
 
 module.exports.dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
-    { new: true }
+    { new: true },
   )
     .then((card) => {
       if (!card) {
-        throw new NotFoundError("Карточка по указанному _id не найдена");
+        throw new NotFoundError('Карточка по указанному _id не найдена');
       }
       res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === "CastError") {
-        next(new BadRequestError("Указан некорректный _id карточки"))
-      } else if (err.name === "DocumentNotFoundError") {
-      next(new NotFoundError("Пользователь по указанному _id не найден"))
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Указан некорректный _id карточки'));
+      } else if (err.name === 'DocumentNotFoundError') {
+        next(new NotFoundError('Пользователь по указанному _id не найден'));
       } else {
         next(err);
       }
-    })
+    });
 };

@@ -215,9 +215,9 @@ function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleRegisterSubmit = (email, passwod) => {
+  const handleRegisterSubmit = (email, password) => {
     auth
-      .register(email, passwod)
+      .register(email, password)
       .then((res) => {
         setIsSuccess(true);
         navigate("/sign-in", { replace: true });
@@ -227,9 +227,8 @@ function App() {
           console.log("400 - некорректно заполнено одно из полей");
         }
         setIsSuccess(false);
-        console.log(err);
       })
-      .finally(() =>  setIsInfoTooltipPopupOpen(true));
+      .finally(() => setIsInfoTooltipPopupOpen(true));
   };
 
   const handleLoginSubmit = (email, password) => {
@@ -242,6 +241,8 @@ function App() {
         navigate("/", { replace: true });
       })
       .catch((err) => {
+        setIsSuccess(false);
+        setIsInfoTooltipPopupOpen(true);
         if (err.status === 400) {
           console.log("400 - не передано одно из полей");
         } else if (err.status === 401) {
